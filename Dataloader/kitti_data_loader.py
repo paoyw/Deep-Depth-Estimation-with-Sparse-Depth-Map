@@ -62,8 +62,21 @@ class kitti(Dataset):
         import glob
         self.do_kb_crop = False
         self.transform = ToTensor()
-        if split == "train":
+        if split == "train-large":
             with open(os.path.join(data_dir_root, "train_13327.txt"), "r") as f:
+                self.depth_files = f.read().splitlines()
+            self.image_files=[]
+            destination_base = './kitti/2011_09_26/{}/image_02/data/'
+            for source_file in self.depth_files:
+                parts = source_file.split('/')
+                common_id = parts[2]  
+                filename = parts[-1]  
+                new_file_path = destination_base.format(common_id) + filename
+                self.image_files.append(new_file_path)
+            self.image_files2 = [r.replace("/image_02/", "/image_03/")for r in self.image_files]
+            self.depth_files2 = [r.replace("/image_02/", "/image_03/")for r in self.depth_files]
+        elif split == "train-small":
+            with open(os.path.join(data_dir_root, "train_1709.txt"), "r") as f:
                 self.depth_files = f.read().splitlines()
             self.image_files=[]
             destination_base = './kitti/2011_09_26/{}/image_02/data/'
@@ -154,12 +167,12 @@ def get_kitti_loader(data_dir_root, split='train', batch_size=1, **kwargs):
 
 
 if __name__ == "__main__":
-    loader = get_kitti_loader( data_dir_root="./kitti", split='train')
+    loader = get_kitti_loader( data_dir_root="./kitti", split='train-small')
     print("Total files", len(loader.dataset))
     for i, sample in enumerate(loader):
 
         print(sample["image"].shape) #camera0 image
-        
+        '''
         image_tensor = sample["image"].squeeze(0).permute(1, 2, 0)  # Remove batch dimension and change to HWC format
         image_numpy = image_tensor.numpy()
         image_numpy = (image_numpy * 255).astype(np.uint8)  # Convert to uint8
@@ -167,7 +180,7 @@ if __name__ == "__main__":
         cv2.imshow('Image', image_bgr)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        
+        '''
         print(sample["depth"].shape) #camera0 depth
         '''
         image_tensor = sample["depth"].squeeze(0).permute(1, 2, 0)  # Remove batch dimension and change to HWC format
