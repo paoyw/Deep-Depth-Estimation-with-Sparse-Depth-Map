@@ -97,6 +97,7 @@ class VKITTI2(Dataset):
         if split == "train":
             with open(os.path.join(data_dir_root, "train.txt"), "r") as f:
                 self.image_files = f.read().splitlines()
+            self.image_files = [os.path.join(data_dir_root,r)for r in self.image_files]
             self.depth_files = [r.replace("/rgb/", "/depth/").replace(
                 "rgb_", "depth_").replace(".jpg", ".png") for r in self.image_files]
             self.image_files2 = [r.replace("/Camera_0/", "/Camera_1/")for r in self.image_files]
@@ -104,6 +105,7 @@ class VKITTI2(Dataset):
         elif split == "test":
             with open(os.path.join(data_dir_root, "test.txt"), "r") as f:
                 self.image_files = f.read().splitlines()
+            self.image_files = [os.path.join(data_dir_root,r)for r in self.image_files]
             self.depth_files = [r.replace("/rgb/", "/depth/").replace(
                 "rgb_", "depth_").replace(".jpg", ".png") for r in self.image_files]
             self.image_files2 = [r.replace("/Camera_0/", "/Camera_1/")for r in self.image_files]
@@ -174,7 +176,7 @@ def get_vkitti2_loader(data_dir_root, split, batch_size=1, **kwargs):
 
 
 if __name__ == "__main__":
-    loader = get_vkitti2_loader( data_dir_root="./vkitti2", split='train')
+    loader = get_vkitti2_loader( data_dir_root="./vkitti2", split='test')
     print("Total files", len(loader.dataset))
     for i, sample in enumerate(loader):
 
