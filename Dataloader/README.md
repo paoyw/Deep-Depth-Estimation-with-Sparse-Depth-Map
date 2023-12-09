@@ -26,7 +26,8 @@ loader = get_vkitti2_loader( data_dir_root="./vkitti2", split='test') #for testi
 
 #kitti
 from kitti_data_loader import get_kitti_loader
-loader = get_kitti_loader( data_dir_root="./kitti", split='train') #for training
+loader = get_kitti_loader( data_dir_root="./kitti", split='train-large') #for training large kitti dataset
+loader = get_kitti_loader( data_dir_root="./kitti", split='train-small') #for training small kitti dataset
 loader = get_kitti_loader( data_dir_root="./kitti", split='test') #for testing
 
 for i, sample in enumerate(loader):
