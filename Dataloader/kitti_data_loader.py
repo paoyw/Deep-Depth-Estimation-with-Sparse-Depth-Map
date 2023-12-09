@@ -62,11 +62,12 @@ class kitti(Dataset):
         import glob
         self.do_kb_crop = False
         self.transform = ToTensor()
+        self.data_dir_root=data_dir_root
         if split == "train-large":
             with open(os.path.join(data_dir_root, "train_13327.txt"), "r") as f:
                 self.depth_files = f.read().splitlines()
             self.image_files=[]
-            destination_base = './kitti/2011_09_26/{}/image_02/data/'
+            destination_base = data_dir_root+'/2011_09_26/{}/image_02/data/'
             for source_file in self.depth_files:
                 parts = source_file.split('/')
                 common_id = parts[2]  
@@ -79,7 +80,7 @@ class kitti(Dataset):
             with open(os.path.join(data_dir_root, "train_1709.txt"), "r") as f:
                 self.depth_files = f.read().splitlines()
             self.image_files=[]
-            destination_base = './kitti/2011_09_26/{}/image_02/data/'
+            destination_base = data_dir_root+'/2011_09_26/{}/image_02/data/'
             for source_file in self.depth_files:
                 parts = source_file.split('/')
                 common_id = parts[2]  
@@ -92,7 +93,7 @@ class kitti(Dataset):
             with open(os.path.join(data_dir_root, "test_2103.txt"), "r") as f:
                 self.depth_files = f.read().splitlines()
             self.image_files=[]
-            destination_base = './kitti/2011_09_26/{}/image_02/data/'
+            destination_base = data_dir_root+'/2011_09_26/{}/image_02/data/'
             for source_file in self.depth_files:
                 parts = source_file.split('/')
                 common_id = parts[2]  
@@ -110,13 +111,13 @@ class kitti(Dataset):
 
         image = Image.open(image_path)
 
-        depth = cv2.imread(os.path.join('./kitti',depth_path), cv2.IMREAD_ANYCOLOR |
+        depth = cv2.imread(os.path.join(self.data_dir_root,depth_path), cv2.IMREAD_ANYCOLOR |
                            cv2.IMREAD_ANYDEPTH) / 100.0  # cm to m
         depth = Image.fromarray(depth)
 
         image2 = Image.open(image_path2)
 
-        depth2 = cv2.imread(os.path.join('./kitti',depth_path2), cv2.IMREAD_ANYCOLOR |
+        depth2 = cv2.imread(os.path.join(self.data_dir_root,depth_path2), cv2.IMREAD_ANYCOLOR |
                            cv2.IMREAD_ANYDEPTH) / 100.0  # cm to m
         depth2 = Image.fromarray(depth2)
 
