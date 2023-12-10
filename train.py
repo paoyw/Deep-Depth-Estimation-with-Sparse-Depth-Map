@@ -4,10 +4,11 @@ import numpy as np
 import torch
 from torch import optim
 from torch.nn import MSELoss
+from torchvision.transforms import Resize
 from tqdm import trange, tqdm
 
 from Dataloader import kitti_data_loader, vkitti2_data_loader
-from Models import MiDaS
+from Models import AutoEncoder, Loss
 
 
 def train(args):
@@ -35,24 +36,29 @@ def train(args):
     else:
         raise NotImplementedError
 
-    net = MiDaS.get_model(args.model_type)
-    optimizer = optim.Adam(net.parameters(), lr=args.lr)
+    net = AutoEncoder.AutoEncoder().to(args.device)
+    optimizer = optim.Adam(net.decoder.parameters(), lr=args.lr)
 
-    criterion = MSELoss()
+    criterion = Loss.MaskedMSE()
 
-    for epoch in trange(args.epoch, ncols=65):
+    for epoch in trange(args.epoch, ncols=100):
         net.train()
         train_loss = []
-        for i, sample in enumerate(tqdm(train_loader)):
-
+        pbar = tqdm(train_loader, ncols=100)
+        optimizer.zero_grad()
+        for i, sample in enumerate(pbar):
             inputs = sample['image'].to(args.device)
             targets = sample['depth'].to(args.device)
+            
             outputs = net(inputs)
-            loss = criterion(targets, outputs)
-            optimizer.zero_grad()
+
+            loss = criterion(outputs, targets, targets != -1)
+
             loss.backward()
-            optimizer.step()
-            tqdm.set_description(
+            if i % args.gradient_accumulate == args.gradient_accumulate - 1 or i == len(train_loader) - 1:
+                optimizer.step()
+                optimizer.zero_grad()
+            pbar.set_description_str(
                 f'Train|epoch: {epoch}|step: {i}|loss: {loss.to("cpu").tolist()}')
             train_loss.append(loss.to('cpu').tolist())
         tqdm.write(f'Train|epoch: {epoch}|loss {np.mean(train_loss)}')
@@ -65,16 +71,12 @@ def train(args):
                     inputs = sample['image'].to(args.device)
                     targets = sample['depth'].to(args.device)
                     outputs = net(inputs)
-                    loss = criterion(targets, outputs)
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
-                    tqdm.set_description(
-                        f'Test|epoch: {epoch}|step: {i}|loss: {loss.to("cpu").tolist()}')
+                    loss = criterion(outputs, targets, targets != -1)
                     test_loss.append(loss.to('cpu').tolist())
                 tqdm.write(f'Test|epoch: {epoch}|loss: {np.mean(test_loss)}')
-            
-
+    
+    state_dict = net.to('cpu').state_dict()
+    torch.save(state_dict, args.ckpt)
 
 def parse_args():
     parser = ArgumentParser()
@@ -82,12 +84,16 @@ def parse_args():
     parser.add_argument('--num_workers', type=int, default=8)
 
     parser.add_argument('--dataset', type=str, required=True)
-    parser.add_argument('--model_type', type=str, default='MiDaS_small')
+    parser.add_argument('--model_type', type=str, default='autoencoder')
 
     parser.add_argument('--epoch', type=int, default=30)
     parser.add_argument('--eval_epoch', type=int, default=1)
     parser.add_argument('--lr', type=float, default=5e-4)
-    parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--pretrained_lr', type=float, default=5e-5)
+    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--gradient_accumulate', type=int, default=4)
+
+    parser.add_argument('--ckpt', type=str, required=True)
     return parser.parse_args()
 
 
