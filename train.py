@@ -51,8 +51,8 @@ def train(args):
             targets = sample['depth'].to(args.device)
             
             outputs = net(inputs)
-
-            loss = criterion(outputs, targets, targets != -1)
+            
+            loss = criterion(outputs, targets / 80, targets != -1)
 
             loss.backward()
             if i % args.gradient_accumulate == args.gradient_accumulate - 1 or i == len(train_loader) - 1:
@@ -71,7 +71,7 @@ def train(args):
                     inputs = sample['image'].to(args.device)
                     targets = sample['depth'].to(args.device)
                     outputs = net(inputs)
-                    loss = criterion(outputs, targets, targets != -1)
+                    loss = criterion(outputs, targets / 80, targets != -1)
                     test_loss.append(loss.to('cpu').tolist())
                 tqdm.write(f'Test|epoch: {epoch}|loss: {np.mean(test_loss)}')
     
@@ -86,12 +86,12 @@ def parse_args():
     parser.add_argument('--dataset', type=str, required=True)
     parser.add_argument('--model_type', type=str, default='autoencoder')
 
-    parser.add_argument('--epoch', type=int, default=30)
+    parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--eval_epoch', type=int, default=1)
-    parser.add_argument('--lr', type=float, default=5e-4)
-    parser.add_argument('--pretrained_lr', type=float, default=5e-5)
+    parser.add_argument('--lr', type=float, default=1e-4)
+    parser.add_argument('--pretrained_lr', type=float, default=1e-4)
     parser.add_argument('--batch_size', type=int, default=4)
-    parser.add_argument('--gradient_accumulate', type=int, default=4)
+    parser.add_argument('--gradient_accumulate', type=int, default=8)
 
     parser.add_argument('--ckpt', type=str, required=True)
     return parser.parse_args()
