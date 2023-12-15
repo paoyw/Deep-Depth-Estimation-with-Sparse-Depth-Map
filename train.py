@@ -37,6 +37,12 @@ def train(args):
         raise NotImplementedError
 
     net = AutoEncoder.AutoEncoder().to(args.device)
+
+    if args.load_ckpt is not None:
+        state_dict = torch.load(args.load_ckpt)
+        net.load_state_dict(state_dict)
+        net = net.to(args.device)
+
     optimizer = optim.Adam(net.decoder.parameters(), lr=args.lr)
 
     criterion = Loss.MaskedMSE()
@@ -85,6 +91,7 @@ def parse_args():
 
     parser.add_argument('--dataset', type=str, required=True)
     parser.add_argument('--model_type', type=str, default='autoencoder')
+    parser.add_argument('--load_ckpt', type=str, default=None)
 
     parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--eval_epoch', type=int, default=1)
