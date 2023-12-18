@@ -36,11 +36,10 @@ class VggEncoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, encoder_channels, scale=80) -> None:
+    def __init__(self, encoder_channels) -> None:
         super().__init__()
         self.encoder_channels = encoder_channels
         self.decoder_channels = [256, 128, 64, 64]
-        self.scale = scale
 
         self.layers = nn.ModuleDict(
             {
@@ -69,8 +68,6 @@ class Decoder(nn.Module):
                     kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
             }
         )
-
-        nn.init.constant_(self.layers['conv4'].bias, val=15)
 
     def __ConvBlock(self, in_channels, out_channels, skip_upsample=False):
         if skip_upsample:
@@ -115,7 +112,7 @@ class Decoder(nn.Module):
             ), dim=1)
         ))
         features.append(self.layers['conv4'](features[-1]))
-        return torch.clip(features[-1], min=-1, max=self.scale)
+        return features[-1]
 
 
 class AutoEncoder(nn.Module):
