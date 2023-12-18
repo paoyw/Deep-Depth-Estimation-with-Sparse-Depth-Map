@@ -3,8 +3,6 @@ from argparse import ArgumentParser
 import numpy as np
 import torch
 from torch import optim
-from torch.nn import MSELoss
-from torchvision.transforms import Resize
 from tqdm import trange, tqdm
 
 from Dataloader import kitti_data_loader, vkitti2_data_loader
@@ -96,7 +94,6 @@ def parse_args():
     parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--eval_epoch', type=int, default=1)
     parser.add_argument('--lr', type=float, default=1e-4)
-    parser.add_argument('--pretrained_lr', type=float, default=1e-4)
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--gradient_accumulate', type=int, default=8)
 
