@@ -38,8 +38,8 @@ example:
 python inference.py \
     --ckpt Models/ckpt/autoencoder_vkitti2.pt \
     --mode q3 \
-    --input_img Dataloader/kitti/RGB/0000000005.png \
-    --ground_truth Dataloader/kitti/Depth/0000000005.png
+    --input_img data_for_test/rgb.png \
+    --ground_truth data_for_test/depth.png
 ```
 ## File path
 
