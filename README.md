@@ -23,7 +23,25 @@ python test.py --dataset kitti_large --load_ckpt Models/ckpt/autoencoder_kitti_l
 python test.py --dataset kitti_large --load_ckpt Models/ckpt/autoencoder_kitti_small.pt
 python test.py --dataset kitti_large --load_ckpt Models/ckpt/autoencoder_kitti_tune.pt
 ```
+## How to inference the model
+```python
+python inference.py \
+    --ckpt [model weight path] \
+    --mode ['q3' | 'q1_q3' | 'mean'] \
+    --input_img [imput image path] \
+    --ground_trute [ground truth depth path] \
+    --icp [store true to turn on icp]
+```
+example:
 
+```python
+python inference.py \
+    --ckpt Models/ckpt/autoencoder_vkitti2.pt \
+    --mode q3 \
+    --input_img Dataloader/kitti/RGB/0000000005.png \
+    --ground_trute Dataloader/kitti/Depth/0000000005.png \
+    --icp
+```
 ## File path
 
 ```
