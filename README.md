@@ -39,13 +39,15 @@ python inference.py \
     --ckpt Models/ckpt/autoencoder_vkitti2.pt \
     --mode q3 \
     --input_img Dataloader/kitti/RGB/0000000005.png \
-    --ground_trute Dataloader/kitti/Depth/0000000005.png \
-    --icp
+    --ground_truth Dataloader/kitti/Depth/0000000005.png
 ```
 ## File path
 
 ```
 └── root
+    ├── data_for_test
+    │   ├── depth.png
+    │   └── rgb.png
     ├── Dataloader/
         ├── kitti/
         ├── vkitti2/
@@ -56,6 +58,9 @@ python inference.py \
         ├── __init__.py
         ├── AutoEncoder.py
         └── Loss.py
+    ├── depthadjust.py
+    ├── exp_plot.ipynb
+    ├── inference.py
     ├── README.md
     ├── train.py
     └── test.py
