@@ -1,5 +1,6 @@
 # NTU 3D Computer Vision Final Project
 
+[![pdf](https://img.shields.io/badge/paper-pdf-f40f02.svg)](https://github.com/paoyw/Deep-Depth-Estimation-with-Sparse-Depth-Map/blob/main/report.pdf)
 
 ## Data Downloads
 Please see the `README.md` under `DataLoader`
